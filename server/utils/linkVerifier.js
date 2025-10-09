@@ -41,11 +41,14 @@ const verifyLink = async (url) => {
 
     // --- C. Real/Safe Link Check (HTTP Request) ---
     try {
-        const response = await axios.head(url, {
+        const response = await axios.get(url, {
             // Set a short timeout to prevent hanging on unresponsive links
             timeout: 5000, 
             // Crucially, disable automatic redirects initially to check the *original* URL's status
             maxRedirects: 0, 
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
             validateStatus: (status) => {
                 // Accept 2xx (Success) and 3xx (Redirection) status codes
                 return status >= 200 && status < 400; 

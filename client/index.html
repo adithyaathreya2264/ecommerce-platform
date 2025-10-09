@@ -14,12 +14,15 @@
             --bs-body-color: #f8fafc; /* Light Text */
             --bs-primary: #fb923c; /* Electric Orange Accent */
             --bs-secondary-bg: #1f2937; /* Darker secondary background */
+			
         }
         
         /* Apply the dark background to the body */
         body {
             background-color: var(--bs-body-bg) !important;
             color: var(--bs-body-color) !important;
+			font-family: Georgia, 'Times New Roman', Times, serif;
+			
         }
 
         /* Custom Card Style for Products */
@@ -199,7 +202,7 @@
             //productList.innerHTML = ''; 
             document.getElementById('loading-gallery').style.display = 'block';
 			productList.innerHTML = '';
-			
+
             try {
                 // Use the native Fetch API to call the GET endpoint
                 const response = await fetch(API_BASE_URL);

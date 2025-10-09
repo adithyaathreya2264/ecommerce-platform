@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curator's Gallery - Link Verified E-Commerce</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* Custom Colors and Theme */
+        :root {
+            --bs-body-bg: #0f172a; /* Deep Navy/Charcoal */
+            --bs-body-color: #f8fafc; /* Light Text */
+            --bs-primary: #fb923c; /* Electric Orange Accent */
+            --bs-secondary-bg: #1f2937; /* Darker secondary background */
+        }
+        
+        /* Apply the dark background to the body */
+        body {
+            background-color: var(--bs-body-bg) !important;
+            color: var(--bs-body-color) !important;
+        }
+
+        /* Custom Card Style for Products */
+        .product-card {
+            background-color: var(--bs-secondary-bg);
+            border: 1px solid #374151; /* Gray border */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .product-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Navigation/Header Styling */
+        .navbar {
+            border-bottom: 1px solid #374151;
+            background-color: var(--bs-body-bg) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Input/Form styling for dark theme */
+        .form-control, .form-control:focus {
+            background-color: #374151;
+            color: var(--bs-body-color);
+            border-color: #4b5563;
+        }
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        /* Hide sections until navigation is clicked */
+        .page-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid container">
+            <a class="navbar-brand text-primary fw-bold fs-4" href="#" onclick="showSection('gallery')">
+                Curator's Gallery
+            </a>
+            <div class="d-flex" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-light" href="#" onclick="showSection('gallery')">Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-primary fw-bold" onclick="showSection('upload')">
+                            Upload Product
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container py-5">
+        
+        <section id="gallery" class="page-section">
+    <h1 class="text-center mb-5 fw-bolder fs-1">The Curator's Gallery</h1>
+    
+    <p id="loading-gallery" class="text-center text-secondary fs-5">Loading verified products...</p>
+
+    <div id="product-list" class="row g-4">
+        </div>
+</section>
+
+        <section id="upload" class="page-section">
+            <div class="row justify-content-center">
+                <div class="col-lg-7 col-md-9">
+                    <h1 class="text-center mb-4 fw-bolder fs-2">Curate a New Link</h1>
+                    
+                    <div class="card p-4 shadow-lg product-card">
+                        
+                        <div id="status-message-area" class="mb-3">
+                            </div>
+
+                        <form id="upload-form">
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label text-light">Product Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required placeholder="Enter the product name">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="image_url" class="form-label text-light">Image URL <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" id="image_url" name="image_url" required placeholder="Enter a public image link (e.g., JPEG, PNG)">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label text-light">Description (Optional)</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Tell us about the product..."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="purchase_link" class="form-label text-light">Purchase Link (Amazon/Flipkart) <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" id="purchase_link" name="purchase_link" required placeholder="Enter the external Amazon or Flipkart URL">
+                            </div>
+
+                            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-100 fw-bold">
+                                Submit & Verify Product
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        
+        // --- API Configuration ---
+        const API_BASE_URL = 'http://localhost:5000/api/products';
+        
+        // --- DOM Elements ---
+        const gallerySection = document.getElementById('gallery');
+        const uploadSection = document.getElementById('upload');
+        const productList = document.getElementById('product-list');
+
+        // --- Core Functions ---
+
+        /**
+         * 1. Navigation Controller: Shows the requested section and hides others.
+         */
+        function showSection(sectionId) {
+            gallerySection.style.display = 'none';
+            uploadSection.style.display = 'none';
+
+            if (sectionId === 'gallery') {
+                gallerySection.style.display = 'block';
+                fetchProducts(); // Refresh gallery whenever we navigate to it
+            } else if (sectionId === 'upload') {
+                uploadSection.style.display = 'flex'; // Use flex for centering the form
+            }
+        }
+
+        /**
+         * 2. Product Card Renderer: Creates the HTML for a single product.
+         */
+        function createProductCard(product) {
+            return `
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 product-card rounded-3 overflow-hidden">
+                        <div style="height: 200px; overflow: hidden;">
+                            <img src="${product.image_url}" class="card-img-top w-100 h-100 object-fit-cover" 
+                                 alt="${product.name}" onerror="this.src='https://via.placeholder.com/300/374151/FFFFFF?text=No+Image';">
+                        </div>
+                        
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-light fw-bold">${product.name}</h5>
+                            <p class="card-text text-secondary mb-3 small flex-grow-1">${product.description || 'No description provided.'}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary-subtle">
+                                <span class="badge text-bg-primary">${product.platform_source}</span>
+                                <a href="${product.purchase_link}" target="_blank" rel="noopener noreferrer" 
+                                   class="btn btn-sm btn-outline-primary fw-bold">
+                                    View Link
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        /**
+         * 3. Fetch Products: Retrieves verified products from the backend.
+         */
+        async function fetchProducts() {
+			console.log('Attempting to fetch products from:', API_BASE_URL);
+            //productList.innerHTML = ''; 
+            document.getElementById('loading-gallery').style.display = 'block';
+			productList.innerHTML = '';
+			
+            try {
+                // Use the native Fetch API to call the GET endpoint
+                const response = await fetch(API_BASE_URL);
+				console.log('Fetch response received. Status:', response.status);
+                const products = await response.json();
+
+				console.log('Products received (count):', products.length); 
+        		console.log('Products data:', products); // Check if previous items are in this array
+                
+                document.getElementById('loading-gallery').style.display = 'none';
+
+                if (products.length === 0) {
+                    productList.innerHTML = '<p class="text-center text-secondary fs-5 col-12">No verified products found. Be the first to upload!</p>';
+                } else {
+                    // Dynamically render the products
+                    const cardsHtml = products.map(createProductCard).join('');
+                    productList.innerHTML = cardsHtml;
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById('loading-gallery').textContent = 'Failed to load products. Is the backend server running?';
+                document.getElementById('loading-gallery').classList.add('text-danger');
+            }
+        }
+
+		// client/index.html (Add this code within the <script> block)
+
+        // --- Form Submission Logic ---
+
+        /**
+         * 4. Display Status Message (Error or Success)
+         */
+        function displayStatus(type, message) {
+            const area = document.getElementById('status-message-area');
+            let alertClass = '';
+            
+            if (type === 'success') {
+                alertClass = 'alert-success';
+            } else if (type === 'error') {
+                alertClass = 'alert-danger';
+            }
+            
+            area.innerHTML = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <strong>${type === 'success' ? 'Success!' : 'Upload Blocked!'}</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        }
+
+        /**
+         * 5. Form Submission Handler (Triggers Verification)
+         */
+        async function handleUpload(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = document.getElementById('submit-btn');
+            const data = {
+                name: form.name.value,
+                description: form.description.value,
+                image_url: form.image_url.value,
+                purchase_link: form.purchase_link.value,
+            };
+
+            displayStatus('info', 'Verifying link...');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Verifying Link... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            try {
+                // Use the native Fetch API for the POST request
+                const response = await fetch(API_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success: Link verified and product saved
+                    displayStatus('success', result.message);
+                    form.reset();
+                    
+                    // Navigate to the gallery after a delay to show the new product
+                    setTimeout(() => {
+                        showSection('gallery');
+                    }, 1500);
+
+                } else {
+                    // Failure: Link verification failed (400 status from backend)
+                    // The backend sends the specific error message in the 'error' field
+                    const errorMessage = result.error || result.message || 'An unknown error occurred during verification.';
+                    displayStatus('error', errorMessage);
+                }
+                
+            } catch (error) {
+                console.error('Network or Server Error:', error);
+                displayStatus('error', 'A network error occurred. Check if the backend server is running.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit & Verify Product';
+            }
+        }
+
+        
+        // --- Event Listener Assignment (Moved to the bottom of the script) ---
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Default view is the gallery
+            showSection('gallery');
+            
+            // 2. Attach submission handler to the form
+            document.getElementById('upload-form').addEventListener('submit', handleUpload);
+            showSection('gallery'); 
+        });
+        
+    </script>
+</body>
+</html>

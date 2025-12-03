@@ -1,4 +1,4 @@
-## Curator's Gallery: Link Verified E-Commerce Platform
+# Curator's Gallery: Link Verified E-Commerce Platform
 🌟 Project Overview
 Curator's Gallery is a simplified e-commerce platform designed to allow users to showcase products alongside external purchase links. The core security feature of this application is the server-side validation of every submitted purchase link, ensuring that uploaded products are tied to live, trusted retail pages (specifically Amazon and Flipkart, as configured).
 
@@ -56,14 +56,14 @@ Provides the user interface, handles form submission, and fetches verified produ
 To run this application, you must have Node.js and npm installed.
 
 Step 1: Clone the Repository & Install Dependencies
-# Clone or create the project structure
+## Clone or create the project structure
 cd ecommerce-platform
 
-# Install Backend Dependencies
+## Install Backend Dependencies
 cd server
 npm install
 
-# Install Axios specifically (for link verification)
+## Install Axios specifically (for link verification)
 npm install axios
 
 Step 2: Configure the Database Connection
@@ -73,7 +73,7 @@ Get URI: Create a database user and whitelist your IP address (0.0.0.0/0 for dev
 
 Update .env: In the server/ directory, open the .env file and update the placeholder with your actual URI:
 
-# server/.env
+## server/.env
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/ecommerceDB?retryWrites=true&w=majority
 PORT=5000
 

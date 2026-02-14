@@ -4,21 +4,16 @@ Curator's Gallery is a simplified e-commerce platform designed to allow users to
 
 If a user attempts to upload a link that is broken, expired, or belongs to an untrusted domain, the upload is blocked with a clear error message.
 
-Key Features
+**Key Features**
 - Robust Link Verification: The backend performs multi-stage checks on the external purchase link:
 - Trusted Domain Check: Ensures the link belongs to a whitelisted retailer (Amazon, Flipkart).
+- Live Status Check: Sends an HTTP request (with a mocked browser User-Agent) to verify the link returns a 200 OK status code, preventing dead links and 404s.
+- Redirection Check: Handles short-links or redirects to ensure the final destination is also trusted.
+- Curator's Gallery Design: A unique, dark-themed, and responsive frontend built using native HTML, JavaScript, and Bootstrap 5.
+- Conditional Display: Only products that have successfully passed the backend verification process (is_link_valid: true) are displayed in the main gallery.
+- Clear User Feedback: Provides specific error messages on the form (e.g., "Link must be from a trusted platform") when an upload is blocked.
 
-Live Status Check: Sends an HTTP request (with a mocked browser User-Agent) to verify the link returns a 200 OK status code, preventing dead links and 404s.
-
-Redirection Check: Handles short-links or redirects to ensure the final destination is also trusted.
-
-Curator's Gallery Design: A unique, dark-themed, and responsive frontend built using native HTML, JavaScript, and Bootstrap 5.
-
-Conditional Display: Only products that have successfully passed the backend verification process (is_link_valid: true) are displayed in the main gallery.
-
-Clear User Feedback: Provides specific error messages on the form (e.g., "Link must be from a trusted platform") when an upload is blocked.
-
-Architecture and Stack
+**Architecture and Stack**
 The project uses a classic split between a robust Node.js backend and a simple, configuration-free HTML frontend.
 
 Component

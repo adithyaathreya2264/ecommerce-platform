@@ -1,13 +1,12 @@
 # Curator's Gallery: Link Verified E-Commerce Platform
-🌟 Project Overview
+Project Overview
 Curator's Gallery is a simplified e-commerce platform designed to allow users to showcase products alongside external purchase links. The core security feature of this application is the server-side validation of every submitted purchase link, ensuring that uploaded products are tied to live, trusted retail pages (specifically Amazon and Flipkart, as configured).
 
 If a user attempts to upload a link that is broken, expired, or belongs to an untrusted domain, the upload is blocked with a clear error message.
 
-✨ Key Features
-Robust Link Verification: The backend performs multi-stage checks on the external purchase link:
-
-Trusted Domain Check: Ensures the link belongs to a whitelisted retailer (Amazon, Flipkart).
+Key Features
+- Robust Link Verification: The backend performs multi-stage checks on the external purchase link:
+- Trusted Domain Check: Ensures the link belongs to a whitelisted retailer (Amazon, Flipkart).
 
 Live Status Check: Sends an HTTP request (with a mocked browser User-Agent) to verify the link returns a 200 OK status code, preventing dead links and 404s.
 
@@ -19,7 +18,7 @@ Conditional Display: Only products that have successfully passed the backend ver
 
 Clear User Feedback: Provides specific error messages on the form (e.g., "Link must be from a trusted platform") when an upload is blocked.
 
-🧱 Architecture and Stack
+Architecture and Stack
 The project uses a classic split between a robust Node.js backend and a simple, configuration-free HTML frontend.
 
 Component
